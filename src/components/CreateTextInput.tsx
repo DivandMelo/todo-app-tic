@@ -11,6 +11,7 @@ import {
   type Path,
   type RegisterOptions
 } from 'react-hook-form';
+import ErrorMessage from './ErrorMessage';
 
 function FormControll({ children, className }: PropsWithChildren<{className?: string}>) {
   return (
@@ -70,31 +71,35 @@ function UncontrolledInput({children, ...rest}: PropsWithChildren<TextInputProps
 function ControlledInput<T extends FieldValues>(props: ControlledInputProps<T>) {
   const { name, control, rules, children, ...inputProps } = props;
 
-  const { field } = useController({ control, name, rules });
+  const { field, fieldState } = useController({ control, name, rules });
 
   return (
-    <View
-      className="rounded-md relative bg-white py-4"
-      style={{
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 5,
-        },
-        shadowOpacity: 0.34,
-        shadowRadius: 6.27,
-        elevation: 10
-      }}
-    >
-      <TextInput
-        className="pl-4"
-        ref={field.ref}
-        onChangeText={field.onChange}
-        value={(field.value as string) || ''}
-        {...inputProps}
-      />
-      {children}
-    </View>
+    <>
+      <View
+        className="rounded-md relative bg-white py-4"
+        style={{
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 5,
+          },
+          shadowOpacity: 0.34,
+          shadowRadius: 6.27,
+          elevation: 10
+        }}
+      >
+        <TextInput
+          className="pl-4"
+          ref={field.ref}
+          onChangeText={field.onChange}
+          value={(field.value as string) || ''}
+          {...inputProps}
+        />
+        {children}
+      </View>
+
+      <ErrorMessage errorMessage={fieldState.error?.message} />
+    </>
   )
 }
 

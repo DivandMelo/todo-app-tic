@@ -9,6 +9,10 @@ import TextInput from '@/components/TextInput';
 import Button from '@/components/Button';
 import { useNavigation } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import ErrorMessage from '@/components/ErrorMessage';
 
 const LoginIcon = ({ children }: PropsWithChildren) => (
   <View
@@ -28,8 +32,33 @@ const LoginIcon = ({ children }: PropsWithChildren) => (
   </View>
 )
 
+const schema = z.object({
+  email: z
+    .string({
+      required_error: 'digite o seu e-mail'
+    })
+    .email('formato de e-mail invalido')
+    .default(''),
+  password: z
+    .string({
+      required_error: 'digite sua senha'
+    })
+    .min(6, 'a senha precisa ter ao menos 6 caracteres')
+    .default('')
+})
+
+type FormSchema = z.infer<typeof schema>;
+
 function Home() {
+  const { handleSubmit, control } = useForm<FormSchema>({
+    resolver: zodResolver(schema),
+  });
+
   const navigator = useNavigation();
+
+  function handleFormSubmit() {
+    navigator.navigate('home')
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -51,15 +80,43 @@ function Home() {
           </LoginIcon>
         </View>
 
-        <View className='my-14 min-w-full gap-6'>
-          <TextInput placeholder='E-mail ou usuário' />
+        <View className='my-14 min-w-full gap-3'>
+          <View>
+            <Controller
+              name="email"
+              control={control}
+              render={({ fieldState, field }) => (
+                <View className='gap-2'>
+                  <TextInput
+                    placeholder='E-mail ou usuário'
+                    onChangeText={field.onChange}
+                    value={field.value}
+                  />
+                  <ErrorMessage errorMessage={fieldState.error?.message} />
+                </View>
+              )}
+            />
+          </View>
 
-          <TextInput placeholder='Senha' />
+          <View>
+            <Controller
+              name="password"
+              control={control}
+              render={({ fieldState, field }) => (
+                <View className='gap-3'>
+                  <TextInput
+                    placeholder='Senha'
+                    onChangeText={field.onChange}
+                    value={field.value}
+                  />
+                  <ErrorMessage errorMessage={fieldState.error?.message} />
+                </View>
+              )}
+            />
+          </View>
         </View>
 
-        <Button onPress={() => {
-          navigator.navigate('home')
-        }}>
+        <Button onPress={handleSubmit(handleFormSubmit)}>
           Acessar
         </Button>
 

@@ -19,12 +19,27 @@ import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useBoundStore } from '@/storage/todo';
 
+import { z } from 'zod';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import ErrorMessage from '@/components/ErrorMessage';
+
 type Form = {
   title: string;
   date: Date;
   hour: Date;
   note: string;
 }
+
+const schema = z
+  .object({
+    title: z
+      .string()
+      .min(6, 'o titulo precisa ter ao menos 6 caracteres'),
+    note: z
+      .string()
+      .min(6, 'sua tarefa precisa ter ao menos 6 caracteres')
+  })
 
 function CreateTodo() {
   const now = dayjs();
@@ -39,7 +54,8 @@ function CreateTodo() {
 
   const navigator = useNavigation();
 
-  const { handleSubmit, control, watch  } = useForm<Form>({
+  const { handleSubmit, control, watch } = useForm<Form>({
+    resolver: zodResolver(schema),
     defaultValues: {
       title: '',
       date: now.toDate(),
@@ -184,18 +200,21 @@ function CreateTodo() {
         <Controller
           name="note"
           control={control}
-          render={({ field }) => (
-            <TextInput
-              multiline={true}
-              numberOfLines={4}
-              placeholder="Notes"
-              value={field.value}
-              onChangeText={field.onChange}
-              className="rounded-md border grow border-[#E0E0E0] p-4"
-              style={{
-                textAlignVertical: 'top'
-              }}
-            />
+          render={({ field, fieldState }) => (
+            <>
+              <TextInput
+                multiline={true}
+                numberOfLines={4}
+                placeholder="Notes"
+                value={field.value}
+                onChangeText={field.onChange}
+                className="rounded-md border grow border-[#E0E0E0] p-4"
+                style={{
+                  textAlignVertical: 'top'
+                }}
+              />
+              <ErrorMessage errorMessage={fieldState.error?.message} />
+            </>
           )}
         />
 
