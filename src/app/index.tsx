@@ -80,7 +80,7 @@ function Home() {
           </LoginIcon>
         </View>
 
-        <View className='my-14 min-w-full gap-4'>
+        <View className='my-14 min-w-full gap-3'>
           <View>
             <Controller
               name="email"
@@ -90,6 +90,8 @@ function Home() {
                   <TextInput
                     placeholder='E-mail ou usuário'
                     onChangeText={field.onChange}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
                     value={field.value}
                   />
                   <ErrorMessage errorMessage={fieldState.error?.message} />
