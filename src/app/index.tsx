@@ -80,7 +80,7 @@ function Home() {
           </LoginIcon>
         </View>
 
-        <View className='my-14 min-w-full gap-3'>
+        <View className='my-14 min-w-full gap-4'>
           <View>
             <Controller
               name="email"
